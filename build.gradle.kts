@@ -22,6 +22,7 @@ dependencies {
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-smallrye-openapi")
     implementation("io.quarkus:quarkus-smallrye-health")
+    implementation("org.checkerframework:checker-qual:3.44.0")
 
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
     implementation("com.helger.commons:ph-commons:11.1.6")

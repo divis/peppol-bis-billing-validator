@@ -5,10 +5,7 @@ import static io.restassured.RestAssured.given;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
@@ -45,25 +42,29 @@ class IndexControllerTest {
     void testValidationEndpointWhenInvokedWithValidPeppolXmlPayloads(
         @NonNull String fixtureFileName
     ) throws IOException {
-        URL fileContent = Objects.requireNonNull(
-            Thread
+        try (
+            var is = Thread
                 .currentThread()
                 .getContextClassLoader()
-                .getResource(fixtureFileName)
-        );
+                .getResourceAsStream(fixtureFileName)
+        ) {
+            Objects.requireNonNull(
+                is,
+                "Fixture file not found: " + fixtureFileName
+            );
+            String content = new String(
+                is.readAllBytes(),
+                StandardCharsets.UTF_8
+            );
 
-        String content = Files.readString(
-            Path.of(fileContent.getFile()),
-            StandardCharsets.UTF_8
-        );
-
-        given()
-            .body(content)
-            .contentType(ContentType.XML)
-            .when()
-            .post("/validation")
-            .then()
-            .statusCode(200);
+            given()
+                .body(content)
+                .contentType(ContentType.XML)
+                .when()
+                .post("/validation")
+                .then()
+                .statusCode(200);
+        }
     }
 
     @ParameterizedTest
@@ -71,24 +72,28 @@ class IndexControllerTest {
     void testValidationEndpointWhenInvokedWithInvalidPeppolXmlPayloads(
         @NonNull String fixtureFileName
     ) throws IOException {
-        URL fileContent = Objects.requireNonNull(
-            Thread
+        try (
+            var is = Thread
                 .currentThread()
                 .getContextClassLoader()
-                .getResource(fixtureFileName)
-        );
+                .getResourceAsStream(fixtureFileName)
+        ) {
+            Objects.requireNonNull(
+                is,
+                "Fixture file not found: " + fixtureFileName
+            );
+            String content = new String(
+                is.readAllBytes(),
+                StandardCharsets.UTF_8
+            );
 
-        String content = Files.readString(
-            Path.of(fileContent.getFile()),
-            StandardCharsets.UTF_8
-        );
-
-        given()
-            .body(content)
-            .contentType(ContentType.XML)
-            .when()
-            .post("/validation")
-            .then()
-            .statusCode(400);
+            given()
+                .body(content)
+                .contentType(ContentType.XML)
+                .when()
+                .post("/validation")
+                .then()
+                .statusCode(400);
+        }
     }
 }
